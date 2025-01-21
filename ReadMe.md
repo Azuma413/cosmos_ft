@@ -48,6 +48,7 @@ python cosmos1/models/autoregressive/nemo/post_training/prepare_dataset.py \
 export HF_TOKEN="<your/HF/access/token>"
 export HF_HOME="/workspace/hf_home"
 # Number of GPU devices available for post-training. At least 2 for 4B and 8 for 12B.
+export CUDA_VISIBLE_DEVICES=1,2
 export NUM_DEVICES=2
 
 # Optionally, you can monitor training progress with Weights and Biases (wandb).
@@ -69,7 +70,7 @@ torchrun --nproc-per-node $NUM_DEVICES cosmos1/models/autoregressive/nemo/post_t
 export HF_TOKEN="<your/HF/access/token>"
 export HF_HOME="/workspace/hf_home"
 # Inference with post-trained model.
-export NEMO_CHECKPOINT=./logs/default/checkpoints/epoch\=0-step\=19
+export NEMO_CHECKPOINT=./logs/default/checkpoints/epoch\=1-step\=99-last
 # Path to the the mp4 file (In git-lfs)
 export INPUT_DATA=/workspace/Cosmos/nuscenes_mp4/output0.mp4
 ```
@@ -85,4 +86,15 @@ torchrun --nproc-per-node 1 cosmos1/models/autoregressive/nemo/inference/general
 --input_image_or_video_path $INPUT_DATA \
 --video_save_name "Cosmos-1.0-Autoregressive-4B.mp4" \
 --ar_model_dir "$NEMO_CHECKPOINT"
+```
+## 初期の重みで推論
+```bash
+export CUDA_VISIBLE_DEVICES=1
+python cosmos1/models/autoregressive/inference/base.py \
+    --input_type=video \
+    --input_image_or_video_path=/workspace/Cosmos/nuscenes_mp4/output0.mp4 \
+    --video_save_name=Cosmos-1.0-Autoregressive-4B \
+    --ar_model_dir=models--nvidia--Cosmos-1.0-Autoregressive-4B \
+    --top_p=0.8 \
+    --temperature=1.0
 ```
